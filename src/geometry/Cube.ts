@@ -1,18 +1,10 @@
 import {vec3, vec4, mat4} from 'gl-matrix';
-import Drawable from '../rendering/gl/Drawable';
-import {gl} from '../globals';
+import Geometry from './Geometry';
 
-class Cube {
-  finalIndices:  Array<number> = new Array();
-  finalPos: Array<number> = new Array();
-  finalNor: Array<number> = new Array();
-  finalCol: Array<number> = new Array();
-  center: vec4;
-  scale: vec3;
-  rotation: number;
-  color: number[];
+class Cube extends Geometry{
 // takes in center, scale, and rotation representing rotation about y in degrees
   constructor(center: vec3, scale: vec3, rotation: number, color: number[]) {
+    super();
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
     this.scale = scale;
     this.rotation = rotation;
@@ -115,26 +107,6 @@ class Cube {
     console.log("Cube");
   }
 
-
-  toRadians(d: number): number {
-    return d * Math.PI / 180.0;
-  }
-
-  getNormals(): Array<number> {
-    return this.finalNor;
-  }
-
-  getIndices(): Array<number> {
-    return this.finalIndices;
-  }
-
-  getPositions(): Array<number> {
-    return this.finalPos;
-  }
-
-  getColors(): Array<number> {
-    return this.finalCol;
-  }
 };
 
 export default Cube;

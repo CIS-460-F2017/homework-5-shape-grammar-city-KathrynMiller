@@ -1,5 +1,6 @@
 import {vec3, vec4, mat4} from 'gl-matrix';
 import Cube from './geometry/Cube';
+import Geometry from './geometry/Geometry';
 
 class Shape {
     symbol: string;
@@ -7,7 +8,7 @@ class Shape {
     position: vec3;
     rotation: number;
     scale: vec3;
-    geometry_type: object;
+    geometry_type: Geometry;
     color: vec3;
 
     constructor(symbol: string, t: boolean, p: vec3, r: number, s: vec3, c: vec3) {
@@ -24,6 +25,10 @@ class Shape {
 
     isTerminal(): boolean {
         return this.terminal;
+    }
+
+    getGeometry(): Geometry {
+        return this.geometry_type;
     }
 }
 
