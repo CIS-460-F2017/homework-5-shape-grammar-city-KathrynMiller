@@ -21,7 +21,6 @@ in vec4 fs_Col;
 uniform float u_Time;
 in vec4 fs_Pos;
 uniform sampler2D u_Texture;
-in vec2 fs_UV;
 
 vec4 baseCol = vec4(204.0 / 255.0, 255.0 / 255.0, 255.0 / 255.0, 1);
 vec4 leafCol = vec4(233.0 / 255.0, 200.0 / 255.0, 91.0 / 255.0, 1);

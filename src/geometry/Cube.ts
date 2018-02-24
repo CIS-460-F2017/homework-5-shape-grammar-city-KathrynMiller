@@ -1,22 +1,27 @@
-import {vec3, vec4} from 'gl-matrix';
+import {vec3, vec4, mat4} from 'gl-matrix';
 import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 
-class Cube extends Drawable {
-  indices: Uint32Array;
-  positions: Float32Array;
-  normals: Float32Array;
-  uvs: Float32Array;
+class Cube {
+  finalIndices:  Array<number> = new Array();
+  finalPos: Array<number> = new Array();
+  finalNor: Array<number> = new Array();
+  finalCol: Array<number> = new Array();
   center: vec4;
-
-  constructor(center: vec3) {
-    super(); // Call the constructor of the super class. This is required.
+  scale: vec3;
+  rotation: number;
+  color: number[];
+// takes in center, scale, and rotation representing rotation about y in degrees
+  constructor(center: vec3, scale: vec3, rotation: number, color: number[]) {
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
+    this.scale = scale;
+    this.rotation = rotation;
+    this.color = color;
+    this.create();
   }
 
   create() {
-
-  this.indices = new Uint32Array([0, 1, 2,
+  this.finalIndices = [0, 1, 2,
                                   0, 2, 3,
                                   4, 5, 6,
                                   4, 6, 7,
@@ -27,118 +32,108 @@ class Cube extends Drawable {
                                   16, 17, 18,
                                   16, 18, 19,
                                   20, 21, 22,
-                                  20, 22, 23]);
-  this.normals = new Float32Array([0, 0, 1, 0,
-                                   0, 0, 1, 0,
-                                   0, 0, 1, 0,
-                                   0, 0, 1, 0,
+                                  20, 22, 23];
+  let normals = new Array<Array<number>>([0, 0, 1, 0],
+                                   [0, 0, 1, 0],
+                                   [0, 0, 1, 0],
+                                   [0, 0, 1, 0],
                                   
-                                   0, 0, -1, 0,
-                                   0, 0, -1, 0,
-                                   0, 0, -1, 0,
-                                   0, 0, -1, 0,
+                                   [0, 0, -1, 0],
+                                   [0, 0, -1, 0],
+                                   [0, 0, -1, 0],
+                                   [0, 0, -1, 0],
                                   
-                                   1, 0, 0, 0,
-                                   1, 0, 0, 0,
-                                   1, 0, 0, 0,
-                                   1, 0, 0, 0,
+                                   [1, 0, 0, 0],
+                                   [1, 0, 0, 0],
+                                   [1, 0, 0, 0],
+                                   [1, 0, 0, 0],
                                   
-                                   -1, 0, 0, 0,
-                                   -1, 0, 0, 0,
-                                   -1, 0, 0, 0,
-                                   -1, 0, 0, 0,
+                                   [-1, 0, 0, 0],
+                                   [-1, 0, 0, 0],
+                                   [-1, 0, 0, 0],
+                                   [-1, 0, 0, 0],
                                   
-                                   0, 1, 0, 0,
-                                   0, 1, 0, 0,
-                                   0, 1, 0, 0,
-                                   0, 1, 0, 0,
+                                   [0, 1, 0, 0],
+                                   [0, 1, 0, 0],
+                                   [0, 1, 0, 0],
+                                   [0, 1, 0, 0],
                                   
-                                   0, -1, 0, 0,
-                                   0, -1, 0, 0,
-                                   0, -1, 0, 0,
-                                   0, -1, 0, 0,]);
-  this.positions = new Float32Array([-1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                     1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                     1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
-                                     -1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
+                                   [0, -1, 0, 0],
+                                   [0, -1, 0, 0],
+                                   [0, -1, 0, 0],
+                                   [0, -1, 0, 0]);
 
-                                     -1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1,
-                                     1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1,
-                                     1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1, 
-                                     -1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1,
+// transform plane based on inputs
+ let positions = new Array<Array<number>>();
+  positions = (                     [[-1, 0, 1, 1],
+                                     [1, 0, 1, 1],
+                                     [1, 1, 1, 1],
+                                     [-1, 1, 1, 1],
 
-                                     1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                    1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1,
-                                      1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1,
-                                      1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
+                                     [-1, 0, -1, 1],
+                                     [1, 0, -1, 1],
+                                     [1, 1 , -1 , 1], 
+                                     [-1, 1, -1, 1],
 
-                                      -1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                      -1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1,
-                                      -1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1,
-                                      -1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
+                                      [1, 0, 1, 1],
+                                      [1, 0, -1, 1],
+                                      [1, 1, -1, 1],
+                                      [1, 1, 1, 1],
 
-                                      -1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
-                                      1 + this.center[0], -2 + this.center[1], 1 + this.center[2], 1,
-                                      1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1,
-                                      -1 + this.center[0], -2 + this.center[1], -1 + this.center[2], 1,
+                                      [-1, 0, 1, 1],
+                                      [-1, 0, -1, 1],
+                                      [-1, 1, -1, 1],
+                                      [-1, 1, 1, 1],
 
-                                      -1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                      1 + this.center[0], -2.2 + this.center[1], 1 + this.center[2], 1,
-                                      1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1,
-                                      -1 + this.center[0], -2.2 + this.center[1], -1 + this.center[2], 1]);
+                                      [-1 ,1, 1, 1],
+                                      [1, 1, 1, 1],
+                                      [1, 1, -1, 1],
+                                      [-1, 1, -1, 1],
 
+                                      [-1, 0, 1, 1],
+                                      [1, 0, 1, 1],
+                                      [1 ,0, -1, 1],
+                                      [-1,0, -1, 1]]);
 
-    // just use as a type to assign color
-    this.uvs = new Float32Array([2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-   
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-   
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-
-     2, 2,
-     2, 2,
-     2, 2,
-     2, 2,
-
-     2, 2,
-     2, 2,
-     2, 2,
-     2, 2]);
-   
-
-    this.generateIdx();
-    this.generatePos();
-    this.generateNor();
-    this.generateUVs();
-
-    this.count = this.indices.length;
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufNor);
-    gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
-    gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+    for(let i = 0; i < positions.length; i++) {
+        let pos = vec4.fromValues(positions[i][0], positions[i][1], positions[i][2], 1);
+        let nor = vec4.fromValues(normals[i][0], normals[i][1], normals[i][2], 0);
+        pos[0] *= this.scale[0];
+        pos[1] *= this.scale[1];
+        pos[2] *= this.scale[2];
+        let rotationMat = mat4.create();
+        mat4.rotate(rotationMat, rotationMat, this.toRadians(this.rotation), vec3.fromValues(0, 1, 0));
+        vec4.transformMat4(pos, pos, rotationMat);
+        vec4.transformMat4(nor, nor, rotationMat);
+        // move position to the input center
+        vec4.add(pos, this.center, pos);
+        this.finalPos = this.finalPos.concat([pos[0], pos[1], pos[2], 1]);
+        this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 1]);
+        // make array of colors 
+        this.finalCol = this.finalCol.concat(this.color);
+    }
+    console.log("Cube");
+  }
 
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUVs);
-    gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
-    console.log(`Created cube`);
+  toRadians(d: number): number {
+    return d * Math.PI / 180.0;
+  }
+
+  getNormals(): Array<number> {
+    return this.finalNor;
+  }
+
+  getIndices(): Array<number> {
+    return this.finalIndices;
+  }
+
+  getPositions(): Array<number> {
+    return this.finalPos;
+  }
+
+  getColors(): Array<number> {
+    return this.finalCol;
   }
 };
 

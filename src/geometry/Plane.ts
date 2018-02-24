@@ -112,42 +112,12 @@ class Plane extends Drawable {
     this.positions = Float32Array.from(finalPos);
 
     this.colors = Float32Array.from(finalCol);
-    // just use as a type to assign color
-    this.uvs = new Float32Array([2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-   
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-   
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
 
-      2, 2,
-      2, 2,
-      2, 2,
-      2, 2,
-
-     2, 2,
-     2, 2,
-     2, 2,
-     2, 2,
-
-     2, 2,
-     2, 2,
-     2, 2,
-     2, 2]);
    
 
     this.generateIdx();
     this.generatePos();
     this.generateNor();
-    this.generateUVs();
     this.generateCol();
 
     this.count = this.indices.length;
@@ -159,10 +129,6 @@ class Plane extends Drawable {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
-
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUVs);
-    gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
     gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
@@ -176,3 +142,5 @@ class Plane extends Drawable {
 };
 
 export default Plane;
+
+

@@ -31,7 +31,7 @@ const controls = {
 };
 
 let square: Square;
-let base: Cube;
+let base: Plane;
 let time: number = 0;
 
 
