@@ -28,6 +28,7 @@ class Shape {
     }
 
     getGeometry(): Geometry {
+        console.log("GET GEO");
         return this.geometry_type;
     }
 }

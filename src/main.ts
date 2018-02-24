@@ -8,6 +8,7 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Plane from './geometry/Plane';
+import CityRenderer from './CityRenderer';
 
 var OBJ = require('webgl-obj-loader');
 let stem: object;
@@ -30,6 +31,7 @@ const controls = {
 
 };
 
+let city: CityRenderer;
 let square: Square;
 let base: Plane;
 let time: number = 0;
@@ -39,7 +41,8 @@ function loadScene() {
   // modified cube to be plant base
   base = new Plane(vec3.fromValues(0, 0, 0), vec3.fromValues(2, 2, 2), 30.0, [1, 1, 1, 1]);
   base.create();
-
+  city = new CityRenderer("c", 1);
+  city.create();
 }
 
 // fix for loader being called after main
@@ -102,6 +105,7 @@ function main2() {
   
     renderer.render(camera, lambert, [
        base, 
+       city
     ]);
     stats.end();
 

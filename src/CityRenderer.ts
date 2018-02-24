@@ -8,10 +8,12 @@ class CityRenderer extends Drawable {
     grammar: Grammar;
     buildings: Set<Shape> = new Set();
 
-    constructior(a: string, i: number) {
+    constructor(a: string, i: number) {
+        super();
         this.iterations = i;
         this.grammar = new Grammar(a);
         this.buildings = this.grammar.getBuildings();
+        this.parseShapeGrammar();
     }
 
     parseShapeGrammar() {
