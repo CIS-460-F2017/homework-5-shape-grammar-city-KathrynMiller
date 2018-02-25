@@ -13,6 +13,7 @@ class Cube extends Geometry{
   }
 
   create() {
+  // reset arrays in case this is being redone to account for scaling
   this.finalPos = new Array();
   this.finalNor = new Array();
 
@@ -107,7 +108,6 @@ class Cube extends Geometry{
         // make array of colors 
         this.finalCol = this.finalCol.concat(this.color);
     }
-    console.log(this.finalPos);
     console.log("Cube");
   }
 

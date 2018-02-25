@@ -19,7 +19,7 @@ class CityRenderer extends Drawable {
     }
 
     parseShapeGrammar() {
-        this.iterations = 1;
+        this.iterations = 3;
         for(let i = 0; i < this.iterations; i++) {
             let newShapes = new Set<Shape>();
             for(let s of this.buildings.values()) {
@@ -41,7 +41,6 @@ class CityRenderer extends Drawable {
             // add all new shapes to the current set of buildings
             for(let newShape of newShapes) {
                 this.buildings.add(newShape);
-                console.log(newShape.getGeometry().getPositions());
             }
            
         }

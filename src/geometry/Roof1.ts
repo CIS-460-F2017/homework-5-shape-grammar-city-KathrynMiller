@@ -19,18 +19,21 @@ class Roof1 extends Geometry{
 
   // use to set static variables before using any instance of the class
   static setObjData(mesh: any) {
+    for(let i = 0; i < mesh.vertices.length; i+=3) {
+        Roof1.vertices = Roof1.vertices.concat([[mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2], 1]]);
+        Roof1.normals = Roof1.normals.concat([[mesh.vertexNormals[i], mesh.vertexNormals[i + 1], mesh.vertexNormals[i + 2], 0]]);
+    }
     for(let i = 0; i < mesh.indices.length; i++) {
-        Roof1.vertices = Roof1.vertices.concat([mesh.vertices[i * 3], mesh.vertices[i * 3 + 1], mesh.vertices[i * 3 + 2], 1]);
-        Roof1.normals = Roof1.normals.concat([mesh.vertexNormals[i * 3], mesh.vertexNormals[i * 3 + 1], mesh.vertexNormals[i * 3 + 2], 0]);
         Roof1.indices = Roof1.indices.concat(mesh.indices[i]);
     }
+    console.log(Roof1.vertices.length);
+    console.log(Roof1.normals.length);
+    console.log(Roof1.indices);
   }
 
   create() {
-    let finalIndics = new Array();
     this.finalIndices = Roof1.indices;
-
-    for(let i = 0; i < Roof1.indices.length; i++) {
+    for(let i = 0; i < Roof1.vertices.length; i++) {
         let pos = vec4.create();
         let nor = vec4.create();
         pos = vec4.fromValues(Roof1.vertices[i][0], Roof1.vertices[i][1], Roof1.vertices[i][2], 1);

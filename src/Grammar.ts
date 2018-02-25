@@ -22,7 +22,6 @@ class Grammar {
 // If max y, and no roof, add roof
 // Terminal if max in all directions then add roof
     divide(oldBuilding: Shape): Set<Shape> {
-        /*
         let newShapes = new Set<Shape>();
         let r = Math.random();
         // TODO base these on population density and oldBuilding center
@@ -51,10 +50,7 @@ class Grammar {
             oldBuilding.makeTerminal();
             newShapes.add(oldBuilding);
         }
-        */
-        let newShapes = new Set<Shape>();
-        this.scaleY(oldBuilding);
-        newShapes.add(oldBuilding);
+
         return newShapes; 
     }
     // scales building in y direction
@@ -98,7 +94,8 @@ class Grammar {
         let r = Math.random();
         let roof: Shape;
         if(r < 1) {
-            roof = new Shape("r1", true, oldBuilding.getCenter(), oldBuilding.getRotation(), oldBuilding.getScale(), vec3.fromValues(1, 1, 1), true);
+            let newCenter = vec3.fromValues(oldBuilding.getCenter()[0],  oldBuilding.getCenter()[0] + oldBuilding.getScale()[1] / 2, oldBuilding.getCenter()[0]);
+            roof = new Shape("r1", true, newCenter, oldBuilding.getRotation(), oldBuilding.getScale(), vec3.fromValues(1, 1, 1), true);
         }
         return roof;
     }
