@@ -8,18 +8,20 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Plane from './geometry/Plane';
+import Roof1 from './geometry/Roof1';
 import CityRenderer from './CityRenderer';
 
 var OBJ = require('webgl-obj-loader');
-let stem: object;
+let roof1: object;
 let leaf: object;
 window.onload = function() {
   OBJ.downloadMeshes({
-    'stem': './src/objs/stem.obj',
-    'leaf': './src/objs/leaf.obj'
+    'roof1': './src/objs/roof1.obj',
+   // 'leaf': './src/objs/leaf.obj'
   }, function(meshes: any) {
-    stem = meshes.stem;
-    leaf = meshes.leaf;
+    roof1 = meshes.roof1;
+    Roof1.setObjData(roof1);
+   // leaf = meshes.leaf;
     main2();
   });
 }
@@ -39,7 +41,7 @@ let time: number = 0;
 
 function loadScene() {
   // modified cube to be plant base
-  base = new Plane(vec3.fromValues(0, 0, 0), vec3.fromValues(2, 2, 2), 30.0, [1, 1, 1, 1]);
+  base = new Plane(vec3.fromValues(0, 0, 0), vec3.fromValues(4, 4, 4), 0.0, [.8, 1, .8, 1]);
   base.create();
   city = new CityRenderer("c", 1);
   city.create();
@@ -49,6 +51,7 @@ function loadScene() {
 function main() {}
 
 function main2() {
+
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);

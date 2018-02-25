@@ -28,8 +28,27 @@ class Shape {
     }
 
     getGeometry(): Geometry {
-        console.log("GET GEO");
         return this.geometry_type;
+    }
+
+    getCenter(): vec3 {
+        return this.position;
+    }
+
+    getRotation(): number {
+        return this.rotation;
+    }
+
+    getScale(): vec3 {
+        return this.scale;
+    }
+
+    getSymbol(): string {
+        return this.symbol;
+    }
+
+    getColor(): vec3 {
+        return this.color;
     }
 }
 

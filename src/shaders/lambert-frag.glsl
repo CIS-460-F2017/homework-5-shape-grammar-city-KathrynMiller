@@ -31,7 +31,6 @@ void main()
 {
     // Material base color (before shading)
     vec4 diffuseColor = fs_Col;
-
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
         // Avoid negative lighting values

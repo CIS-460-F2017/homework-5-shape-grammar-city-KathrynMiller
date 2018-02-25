@@ -7,9 +7,11 @@ class CityRenderer extends Drawable {
     iterations: number;
     grammar: Grammar;
     buildings: Set<Shape> = new Set();
+    lastIdx: number;
 
     constructor(a: string, i: number) {
         super();
+        this.lastIdx = 0;
         this.iterations = i;
         this.grammar = new Grammar(a);
         this.buildings = this.grammar.getBuildings();
@@ -17,26 +19,29 @@ class CityRenderer extends Drawable {
     }
 
     parseShapeGrammar() {
-        let newShapes = new Set<Shape>();
+        this.iterations = 3;
         for(let i = 0; i < this.iterations; i++) {
+            let newShapes = new Set<Shape>();
             for(let s of this.buildings.values()) {
                 if(!s.isTerminal()) {
                     //divide this building appropriately based on rules and add its new components to the set of buildings
                     let successors = this.grammar.divide(s);
+                    console.log(this.buildings.size);
                     // remove the building from our current set
                     this.buildings.delete(s);
+
                     // add the buildings successors to the set of new buildings
                     for(let newShape of successors) {
                         newShapes.add(newShape);
-                    }
+                    }   
                 }
+            }
+            for(let newShape of newShapes) {
+                this.buildings.add(newShape);
             }
         }
         // add all new shapes to the current set of buildings
-        for(let newShape of newShapes) {
-            this.buildings.add(newShape);
-        }
-        this.create();
+        
     } 
     
     create() {
@@ -48,9 +53,14 @@ class CityRenderer extends Drawable {
         for(let shape of this.buildings) {
             finalPos = finalPos.concat(shape.getGeometry().getPositions());
             finalNor = finalNor.concat(shape.getGeometry().getNormals());
-            finalIdx = finalIdx.concat(shape.getGeometry().getIndices());
             finalCol = finalCol.concat(shape.getGeometry().getColors());
+            let n = shape.getGeometry().getIndices().length;
+            for(let j = 0; j < n; j++) {
+                finalIdx.push(shape.getGeometry().getIndices()[j] + this.lastIdx);
+            }
+            this.lastIdx += shape.getGeometry().getPositions().length / 4;
         }
+        console.log(finalIdx);
         // pass all shape information to gpu
         let positions = Float32Array.from(finalPos);
         let normals = Float32Array.from(finalNor);
@@ -74,7 +84,6 @@ class CityRenderer extends Drawable {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-        console.log("CITY");
     }
 
 
