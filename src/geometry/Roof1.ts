@@ -27,11 +27,14 @@ class Roof1 extends Geometry{
   }
 
   create() {
+    let finalIndics = new Array();
     this.finalIndices = Roof1.indices;
 
-    for(let i = 0; i < Roof1.vertices.length; i++) {
-        let pos = vec4.fromValues(Roof1.vertices[i][0], Roof1.vertices[i][1], Roof1.vertices[i][2], 1);
-        let nor = vec4.fromValues(Roof1.normals[i][0], Roof1.normals[i][1], Roof1.normals[i][2], 0);
+    for(let i = 0; i < Roof1.indices.length; i++) {
+        let pos = vec4.create();
+        let nor = vec4.create();
+        pos = vec4.fromValues(Roof1.vertices[i][0], Roof1.vertices[i][1], Roof1.vertices[i][2], 1);
+        nor = vec4.fromValues(Roof1.normals[i][0], Roof1.normals[i][1], Roof1.normals[i][2], 0);
         pos[0] *= this.scale[0];
         pos[1] *= this.scale[1];
         pos[2] *= this.scale[2];

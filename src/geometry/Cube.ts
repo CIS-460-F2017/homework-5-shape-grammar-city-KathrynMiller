@@ -13,6 +13,9 @@ class Cube extends Geometry{
   }
 
   create() {
+  this.finalPos = new Array();
+  this.finalNor = new Array();
+
   this.finalIndices = [0, 1, 2,
                                   0, 2, 3,
                                   4, 5, 6,
@@ -104,6 +107,7 @@ class Cube extends Geometry{
         // make array of colors 
         this.finalCol = this.finalCol.concat(this.color);
     }
+    console.log(this.finalPos);
     console.log("Cube");
   }
 

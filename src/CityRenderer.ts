@@ -19,28 +19,32 @@ class CityRenderer extends Drawable {
     }
 
     parseShapeGrammar() {
-        this.iterations = 3;
+        this.iterations = 1;
         for(let i = 0; i < this.iterations; i++) {
             let newShapes = new Set<Shape>();
             for(let s of this.buildings.values()) {
                 if(!s.isTerminal()) {
                     //divide this building appropriately based on rules and add its new components to the set of buildings
                     let successors = this.grammar.divide(s);
-                    console.log(this.buildings.size);
                     // remove the building from our current set
                     this.buildings.delete(s);
-
                     // add the buildings successors to the set of new buildings
                     for(let newShape of successors) {
                         newShapes.add(newShape);
                     }   
+                } else if (s.isTerminal() && !s.hasRoof()) { // if building is terminal in all directions, add roof 
+                    console.log("ADD ROOF");
+                    let roof = this.grammar.addRoof(s);
+                    newShapes.add(roof);
                 }
             }
+            // add all new shapes to the current set of buildings
             for(let newShape of newShapes) {
                 this.buildings.add(newShape);
+                console.log(newShape.getGeometry().getPositions());
             }
+           
         }
-        // add all new shapes to the current set of buildings
         
     } 
     
@@ -60,7 +64,6 @@ class CityRenderer extends Drawable {
             }
             this.lastIdx += shape.getGeometry().getPositions().length / 4;
         }
-        console.log(finalIdx);
         // pass all shape information to gpu
         let positions = Float32Array.from(finalPos);
         let normals = Float32Array.from(finalNor);
