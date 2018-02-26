@@ -2,6 +2,9 @@ import {vec3, vec4, mat4} from 'gl-matrix';
 import Cube from './geometry/Cube';
 import Geometry from './geometry/Geometry';
 import Roof1 from './geometry/Roof1';
+import Roof2 from './geometry/Roof2';
+import Roof3 from './geometry/Roof3';
+import Plane from './geometry/Plane';
 
 class Shape {
     symbol: string;
@@ -29,9 +32,11 @@ class Shape {
         } else if (symbol == "r1") {
             this.geometry_type = new Roof1(p, s, r, [c[0], c[1], c[2], 1]);
         } else if (symbol == "r2") {
-
+            this.geometry_type = new Roof2(p, s, r, [c[0], c[1], c[2], 1]);
         } else if (symbol == "r3") {
-
+            this.geometry_type = new Roof3(p, s, r, [c[0], c[1], c[2], 1]);
+        } else if (symbol == "p") {
+            this.geometry_type = new Plane(p, s, r, [c[0], c[1], c[2], 1]);
         }
     }
 

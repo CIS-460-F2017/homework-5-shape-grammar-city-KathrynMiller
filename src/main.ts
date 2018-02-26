@@ -9,19 +9,26 @@ import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Plane from './geometry/Plane';
 import Roof1 from './geometry/Roof1';
+import Roof2 from './geometry/Roof2';
+import Roof3 from './geometry/Roof3';
 import CityRenderer from './CityRenderer';
 
 var OBJ = require('webgl-obj-loader');
 let roof1: object;
-let leaf: object;
+let roof2: object;
+let roof3: object;
 window.onload = function() {
   OBJ.downloadMeshes({
     'roof1': './src/objs/roof1.obj',
-   // 'leaf': './src/objs/leaf.obj'
+    'roof2': './src/objs/roof2.obj',
+    'roof3': './src/objs/roof3.obj'
   }, function(meshes: any) {
     roof1 = meshes.roof1;
     Roof1.setObjData(roof1);
-   // leaf = meshes.leaf;
+    roof2 = meshes.roof2;
+    Roof2.setObjData(roof2);
+    roof3 = meshes.roof3;
+    Roof3.setObjData(roof3);
     main2();
   });
 }
@@ -35,13 +42,13 @@ const controls = {
 
 let city: CityRenderer;
 let square: Square;
-let base: Plane;
+let base: Square;
 let time: number = 0;
 
 
 function loadScene() {
   // modified cube to be plant base
-  base = new Plane(vec3.fromValues(0, 0, 0), vec3.fromValues(4, 4, 4), 0.0, [.8, 1, .8, 1]);
+  base = new Square(vec3.fromValues(0, 0, 0), vec3.fromValues(14, 14, 14), 0.0, [1, 1, 1, 1]);
   base.create();
   city = new CityRenderer("c", 1);
   city.create();
@@ -77,7 +84,7 @@ function main2() {
 
     loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 2, 8), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 15, 20), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);

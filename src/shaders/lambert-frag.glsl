@@ -21,16 +21,22 @@ in vec4 fs_Col;
 uniform float u_Time;
 in vec4 fs_Pos;
 uniform sampler2D u_Texture;
-
-vec4 baseCol = vec4(204.0 / 255.0, 255.0 / 255.0, 255.0 / 255.0, 1);
-vec4 leafCol = vec4(233.0 / 255.0, 200.0 / 255.0, 91.0 / 255.0, 1);
+in vec2 fs_UV;
+float fbm(const in vec2 uv);
+float noise(in vec2 uv);
 
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 void main()
 {
-    // Material base color (before shading)
-    vec4 diffuseColor = fs_Col;
+        // Material base color (before shading)
+        vec4 diffuseColor = fs_Col;
+        if(fs_UV.x == 2.0) {
+            float f = fbm(fs_UV);
+            diffuseColor = vec4(f, f, f,1);
+            float n = noise(fs_UV);
+            diffuseColor = vec4(n, n, n, 1);
+        }
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
         // Avoid negative lighting values
@@ -43,5 +49,42 @@ void main()
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+        out_Col = diffuseColor;
+       // out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+}
+
+vec2 smoothF(vec2 uv)
+{
+    return uv*uv*(3.-2.*uv);
+}
+// for use in fbm
+float noise(in vec2 uv)
+{
+    const float k = 257.;
+    vec4 l  = vec4(floor(uv),fract(uv));
+    float u = l.x + l.y * k;
+    vec4 v  = vec4(u, u+1.,u+k, u+k+1.);
+    v       = fract(fract(1.23456789*v)*v/.987654321);
+    l.zw    = smoothF(l.zw);
+    l.x     = mix(v.x, v.y, l.z);
+    l.y     = mix(v.z, v.w, l.z);
+    return    mix(l.x, l.y, l.w);
+}
+
+float fbm(const in vec2 uv)
+{
+    float a = 0.5;
+    float f = 1.0;
+    float n = 0.;
+    int it = 8;
+    for(int i = 0; i < 32; i++)
+    {
+        if(i<it)
+        {
+            n += noise(uv*f)*a;
+            a *= .5;
+            f *= 2.;
+        }
+    }
+    return n;
 }

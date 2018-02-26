@@ -19,10 +19,10 @@ class CityRenderer extends Drawable {
     }
 
     parseShapeGrammar() {
-        this.iterations = 3;
+        this.iterations = 8;
         for(let i = 0; i < this.iterations; i++) {
             let newShapes = new Set<Shape>();
-            for(let s of this.buildings.values()) {
+            for(let s of this.buildings) {
                 if(!s.isTerminal()) {
                     //divide this building appropriately based on rules and add its new components to the set of buildings
                     let successors = this.grammar.divide(s);
@@ -42,7 +42,6 @@ class CityRenderer extends Drawable {
             for(let newShape of newShapes) {
                 this.buildings.add(newShape);
             }
-           
         }
         
     } 
@@ -52,6 +51,7 @@ class CityRenderer extends Drawable {
         let finalNor = new Array();
         let finalIdx = new Array();
         let finalCol = new Array();
+        this.lastIdx = 0;
         // add vbo data from each shape to final vbo data
         for(let shape of this.buildings) {
             finalPos = finalPos.concat(shape.getGeometry().getPositions());
