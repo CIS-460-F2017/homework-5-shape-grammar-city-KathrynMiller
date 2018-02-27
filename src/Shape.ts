@@ -35,7 +35,7 @@ class Shape {
             this.geometry_type = new Roof2(p, s, r, [c[0], c[1], c[2], 1]);
         } else if (symbol == "r3") {
             this.geometry_type = new Roof3(p, s, r, [c[0], c[1], c[2], 1]);
-        } else if (symbol == "p") {
+        } else if (symbol == "r") {
             this.geometry_type = new Plane(p, s, r, [c[0], c[1], c[2], 1]);
         }
     }

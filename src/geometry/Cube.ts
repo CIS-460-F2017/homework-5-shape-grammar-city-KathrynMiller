@@ -98,7 +98,7 @@ class Cube extends Geometry{
         pos[1] *= this.scale[1];
         pos[2] *= this.scale[2];
         let rotationMat = mat4.create();
-        mat4.rotate(rotationMat, rotationMat, this.toRadians(this.rotation), vec3.fromValues(0, 1, 0));
+        mat4.rotate(rotationMat, rotationMat, this.rotation, vec3.fromValues(0, 1, 0));
         vec4.transformMat4(pos, pos, rotationMat);
         vec4.transformMat4(nor, nor, rotationMat);
         // move position to the input center
@@ -108,7 +108,6 @@ class Cube extends Geometry{
         // make array of colors 
         this.finalCol = this.finalCol.concat(this.color);
     }
-    console.log("Cube");
   }
 
 };

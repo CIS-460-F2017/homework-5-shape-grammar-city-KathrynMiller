@@ -13,11 +13,6 @@ abstract class Geometry {
   rotation: number;
   color: number[];
 
-
-  toRadians(d: number): number {
-    return d * Math.PI / 180.0;
-  }
-
   getNormals(): Array<number> {
     return this.finalNor;
   }

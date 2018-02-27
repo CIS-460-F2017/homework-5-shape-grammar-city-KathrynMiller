@@ -33,9 +33,7 @@ void main()
         vec4 diffuseColor = fs_Col;
         if(fs_UV.x == 2.0) {
             float f = fbm(fs_UV);
-            diffuseColor = vec4(f, f, f,1);
-            float n = noise(fs_UV);
-            diffuseColor = vec4(n, n, n, 1);
+            diffuseColor = vec4(1);
         }
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
@@ -49,8 +47,7 @@ void main()
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        out_Col = diffuseColor;
-       // out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 }
 
 vec2 smoothF(vec2 uv)
