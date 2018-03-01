@@ -5,7 +5,7 @@ import {gl} from '../globals';
 class Plane extends Geometry {
 
 // takes in center, scale, and rotation representing rotation about y in degrees
-  constructor(center: vec3, scale: vec3, rotation: number, color: number[]) {
+  constructor(center: vec3, scale: vec3, rotation: number, color: vec3) {
     super();
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
     this.scale = scale;
@@ -48,9 +48,9 @@ class Plane extends Geometry {
           // move position to the input center
           vec4.add(pos, this.center, pos);
           this.finalPos = this.finalPos.concat([pos[0], pos[1], pos[2], 1]);
-          this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 1]);
+          this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 0]);
           // make array of colors 
-          this.finalCol = this.finalCol.concat(this.color);
+          this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
       }
 
   }

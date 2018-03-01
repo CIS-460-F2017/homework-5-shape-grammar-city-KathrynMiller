@@ -8,7 +8,7 @@ class Roof3 extends Geometry{
     static indices: Array<number> = new Array();
 
 // takes in center, scale, and rotation representing rotation about y in degrees
-  constructor(center: vec3, scale: vec3, rotation: number, color: number[]) {
+  constructor(center: vec3, scale: vec3, rotation: number, color: vec3) {
     super();
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
     this.scale = scale;
@@ -20,8 +20,8 @@ class Roof3 extends Geometry{
   // use to set static variables before using any instance of the class
   static setObjData(mesh: any) {
     for(let i = 0; i < mesh.vertices.length; i+=3) {
-        Roof3.vertices = Roof3.vertices.concat([[mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2], 1]]);
-        Roof3.normals = Roof3.normals.concat([[mesh.vertexNormals[i], mesh.vertexNormals[i + 1], mesh.vertexNormals[i + 2], 0]]);
+        Roof3.vertices = Roof3.vertices.concat([[mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]]]);
+        Roof3.normals = Roof3.normals.concat([[mesh.vertexNormals[i], mesh.vertexNormals[i + 1], mesh.vertexNormals[i + 2]]]);
     }
     for(let i = 0; i < mesh.indices.length; i++) {
         Roof3.indices = Roof3.indices.concat(mesh.indices[i]);
@@ -45,9 +45,9 @@ class Roof3 extends Geometry{
         // move position to the input center
         vec4.add(pos, this.center, pos);
         this.finalPos = this.finalPos.concat([pos[0], pos[1], pos[2], 1]);
-        this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 1]);
+        this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 0]);
         // make array of colors 
-        this.finalCol = this.finalCol.concat(this.color);
+        this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
     }
   }
 

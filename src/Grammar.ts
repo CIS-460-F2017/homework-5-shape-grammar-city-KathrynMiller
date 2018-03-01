@@ -23,47 +23,123 @@ class Grammar {
 // Terminal if max in all directions then add roof
     divide(oldBuilding: Shape): Set<Shape> {
         let newShapes = new Set<Shape>();
+        //let r = .6;
         let r = Math.random();
         // TODO base these on population density and oldBuilding center
         let areaMin = .2;
-        let heightMax = 2.5;
-        // don't subdivide in x or z, only go up
-        if(oldBuilding.getArea() / 2.0 <= areaMin) { // if can't divide by x or z anymore
-            if(oldBuilding.getHeight() < heightMax) { // terminal x and z but not max height
-                console.log("build height  " + oldBuilding.getColor());
-                this.scaleY(oldBuilding);
-                newShapes.add(oldBuilding);
-                return newShapes; 
-            } else { // terminal everywehre
-                oldBuilding.makeTerminal();
-                newShapes.add(oldBuilding);
-                return newShapes;
-            }
-        } else if (oldBuilding.getHeight() > heightMax) { // can't add in y direction
-            console.log("too high  " + oldBuilding.getColor());
-            if(r < .5) {
-                console.log("divideX  " + oldBuilding.getColor());
-                newShapes = this.divideX(oldBuilding);
-            } else {
-                console.log("divideZ  " + oldBuilding.getColor());
-                newShapes = this.divideZ(oldBuilding);
-            }
-            return newShapes; 
-        }  else { // can build in any direction
-            if(r < .33) {
-                console.log("divideX  " + oldBuilding.getColor());
-                newShapes = this.divideX(oldBuilding);
-            } else if(r < .67) {
-                console.log("divideZ  " + oldBuilding.getColor());
-                newShapes = this.divideZ(oldBuilding);
-            } else {
-                console.log("scaleY  " + oldBuilding.getColor());
-                this.scaleY(oldBuilding);
-                newShapes.add(oldBuilding);
-            }
-            return newShapes; 
-        } 
+        // creates a falloff based on distance of building from the center
+        let heightMax = 2.5 / Math.pow(1.2, vec3.length(oldBuilding.getCenter()));
+        if(r < .2) {
+            newShapes = this.type1(oldBuilding);
+        } else if (r < .4) {
+            newShapes = this.type2(oldBuilding);
+        } else if (r < .6) {
+            newShapes = this.type3(oldBuilding);
+        } else if (r < .8) {
+            newShapes = this.type4(oldBuilding);
+        } else {
+            newShapes.add(oldBuilding);
+        }
+
+        return newShapes;
     }
+
+    //divide random side, divide random half in other direction, scale all up a little
+    type1(oldBuilding: Shape): Set<Shape> {
+        let r = Math.random();
+        let divisionAxis = "";
+        let newShapes = new Set<Shape>();
+        let halves = new Set<Shape>();
+        if(r < .5) {
+            halves = this.divideX(oldBuilding);
+            divisionAxis = "x";
+        } else {
+            halves = this.divideZ(oldBuilding);
+            divisionAxis = "z";
+            
+        }
+        // pick random half and divide it in other direction
+        let i = 0;
+        r = Math.floor(Math.random() + 1); // 0 or 1
+        for(let half of halves) {
+            if(i == r) {
+                if(divisionAxis == "z") {
+                    for(let s of this.divideX(half)) {
+                        newShapes.add(s);
+                    }
+                } else {
+                    for(let s of this.divideZ(half)) {
+                        newShapes.add(s);
+                    }
+                }
+            } else {
+                newShapes.add(half);
+            }
+            i++;
+        }
+        return newShapes;
+    }
+    // divide in both x and z (creates 4 square little towers)
+    type2(oldBuilding: Shape): Set<Shape> {
+        let r = Math.random();
+        let divisionAxis = "";
+        let newShapes = new Set<Shape>();
+        let halves = new Set<Shape>();
+        if(r < .5) {
+            halves = this.divideX(oldBuilding);
+            divisionAxis = "x";
+        } else {
+            halves = this.divideZ(oldBuilding);
+            divisionAxis = "z";
+            
+        }
+        // divide both halves in other direction
+        for(let half of halves) {
+            if(divisionAxis == "z") {
+                for(let s of this.divideX(half)) {
+                    newShapes.add(s);
+                }
+            } else {
+                for(let s of this.divideZ(half)) {
+                        newShapes.add(s);
+                }
+            }
+        }
+        return newShapes;
+    }
+    // divide in half in either x or z
+    type3(oldBuilding: Shape): Set<Shape> {
+        let r = Math.random();
+        let halves = new Set<Shape>();
+        if(r < .5) {
+            halves = this.divideX(oldBuilding);
+        } else {
+            halves = this.divideZ(oldBuilding);   
+        }
+        return halves;
+    }
+    // creates one building with two pillars in the front
+    type4(oldBuilding: Shape): Set<Shape> {
+        let newShapes = new Set<Shape>();
+        let halves = this.divideX(oldBuilding);
+        let offset = oldBuilding.getScale()[0] / 4.0 + .05;
+        let baseCenter = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] - offset);
+        let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
+        let base = new Shape("c", false, baseCenter, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
+        
+        let p1Center = vec3.fromValues(oldBuilding.getCenter()[0] - offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + .1);
+        let p2Center = vec3.fromValues(oldBuilding.getCenter()[0] + offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + .1);
+        let pillarScale = vec3.fromValues(newScale[0] / 3.0 - .01, newScale[1], newScale[2] / 1.5);
+        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(0, 0, 1), oldBuilding.hasRoof());
+        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 0, 0), oldBuilding.hasRoof());
+
+        newShapes.add(p1);
+        newShapes.add(p2);
+        newShapes.add(base);
+ 
+        return newShapes;
+    }
+
     // scales building in y direction
     scaleY(oldBuilding: Shape){
         oldBuilding.scaleY(1.5);
@@ -72,8 +148,16 @@ class Grammar {
     divideZ(oldBuilding: Shape): Set<Shape> {
         // offset amount from current centers
         let offset = oldBuilding.getScale()[2] / 4.0 + .07;
-        let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] - offset);
-        let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + offset);
+        let forward = vec3.create();
+        // get forward vector and move forward and backwards along this instead of always z
+        vec3.normalize(forward, oldBuilding.getCenter());
+        vec3.scale(forward, forward, offset);
+        //let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] - offset);
+        let newCenter1 = vec3.create();
+        vec3.subtract(newCenter1, oldBuilding.getCenter(), forward);
+        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + offset);
+        let newCenter2 = vec3.create();
+        vec3.add(newCenter2, oldBuilding.getCenter(), forward);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
 
         let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), oldBuilding.hasRoof());
@@ -88,8 +172,19 @@ class Grammar {
     divideX(oldBuilding: Shape): Set<Shape> {
         // offset amount from current centers
         let offset = oldBuilding.getScale()[0] / 4.0 + .07;
-        let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0] - offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
-        let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0] + offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
+        let forward = vec3.create();
+        let tangent = vec3.create();
+        // get forward vector and move forward and backwards along this instead of always z
+        vec3.normalize(forward, oldBuilding.getCenter());
+        vec3.cross(tangent, forward, vec3.fromValues(0, 1, 0));
+        vec3.scale(tangent, tangent, offset);
+        let newCenter1 = vec3.create();
+        vec3.subtract(newCenter1, oldBuilding.getCenter(), tangent);
+        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + offset);
+        let newCenter2 = vec3.create();
+        vec3.add(newCenter2, oldBuilding.getCenter(), tangent);
+        //let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0] - offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
+        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0] + offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0] / 2.0 - .01, oldBuilding.getScale()[1], oldBuilding.getScale()[2]);
 
         let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
@@ -105,7 +200,7 @@ class Grammar {
         let r = Math.random();
         let roof: Shape;
         let newCenter = vec3.fromValues(oldBuilding.getCenter()[0],  oldBuilding.getCenter()[1] + oldBuilding.getScale()[1] / 2, oldBuilding.getCenter()[2]);
-        let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1] - .5, oldBuilding.getScale()[2])
+        let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1] - .7, oldBuilding.getScale()[2])
         if(r < .33) {
             roof = new Shape("r1", true, newCenter, oldBuilding.getRotation(), newScale, oldBuilding.getColor(), true);
         } else if (r < .67) {

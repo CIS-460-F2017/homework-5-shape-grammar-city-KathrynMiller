@@ -7,13 +7,13 @@ import Roof3 from './geometry/Roof3';
 import Plane from './geometry/Plane';
 
 class Shape {
-    symbol: string;
+    symbol: string = "";
     terminal: boolean;
-    position: vec3;
-    rotation: number;
-    scale: vec3;
+    position: vec3 = vec3.create();
+    rotation: number = 0;
+    scale: vec3 = vec3.create();
     geometry_type: Geometry;
-    color: vec3;
+    color: vec3 = vec3.create();
     // keep track of how many building slabs are stacked beneath 
     // edit: not using yet unless want to add window layers later
     height: number;
@@ -22,27 +22,29 @@ class Shape {
     constructor(symbol: string, t: boolean, p: vec3, r: number, s: vec3, c: vec3, roof: boolean) {
         this.symbol = symbol;
         this.terminal = t;
-        this.position = p;
+        vec3.copy(this.position, p);
         this.rotation = r;
-        this.scale = s;
-        this.color = c;
+        vec3.copy(this.scale, s);
+        vec3.copy(this.color, c);
         this.roof = roof;
         if(symbol == "c") {
-            this.geometry_type = new Cube(p, s, r, [c[0], c[1], c[2], 1]);
+            this.geometry_type = new Cube(this.position, this.scale, this.rotation, this.color);
         } else if (symbol == "r1") {
-            this.geometry_type = new Roof1(p, s, r, [c[0], c[1], c[2], 1]);
+            this.geometry_type = new Roof1(this.position, this.scale, this.rotation, this.color);
         } else if (symbol == "r2") {
-            this.geometry_type = new Roof2(p, s, r, [c[0], c[1], c[2], 1]);
+            this.geometry_type = new Roof2(this.position, this.scale, this.rotation, this.color);
         } else if (symbol == "r3") {
-            this.geometry_type = new Roof3(p, s, r, [c[0], c[1], c[2], 1]);
+            this.geometry_type = new Roof3(this.position, this.scale, this.rotation, this.color);
         } else if (symbol == "r") {
-            this.geometry_type = new Plane(p, s, r, [c[0], c[1], c[2], 1]);
+            this.geometry_type = new Plane(this.position, this.scale, this.rotation, this.color);
         }
     }
 
     scaleY(h: number) {
+        console.log("scale");
         this.scale[1] += h;
         // reset vbo data
+        this.geometry_type.scale[1] += h;
         this.geometry_type.create();
     }
 
@@ -63,11 +65,11 @@ class Shape {
     }
 
     getRotation(): number {
-        return this.rotation;
+        return this.geometry_type.getRotation();
     }
 
     getScale(): vec3 {
-        return this.scale;
+        return this.geometry_type.getScale();
     }
 
     getSymbol(): string {
@@ -75,11 +77,16 @@ class Shape {
     }
 
     getColor(): vec3 {
-        return this.color;
+        return this.geometry_type.getColor();
+    }
+
+    setRotation(degree: number) {
+        this.geometry_type.setRotation(degree);
+        console.log("get rotation: " + this.geometry_type.getRotation());
     }
 
     getHeight(): number {
-        return this.scale[1];
+        return this.geometry_type.getScale()[1];
     }
 
     hasRoof(): boolean {

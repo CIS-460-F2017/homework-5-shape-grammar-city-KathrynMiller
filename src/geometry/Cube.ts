@@ -3,13 +3,12 @@ import Geometry from './Geometry';
 
 class Cube extends Geometry{
 // takes in center, scale, and rotation representing rotation about y in degrees
-  constructor(center: vec3, scale: vec3, rotation: number, color: number[]) {
+  constructor(center: vec3, scale: vec3, rotation: number, color: vec3) {
     super();
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
     this.scale = scale;
     this.rotation = rotation;
     this.color = color;
-    this.create();
   }
 
   create() {
@@ -94,20 +93,25 @@ class Cube extends Geometry{
     for(let i = 0; i < positions.length; i++) {
         let pos = vec4.fromValues(positions[i][0], positions[i][1], positions[i][2], 1);
         let nor = vec4.fromValues(normals[i][0], normals[i][1], normals[i][2], 0);
+        // scale
         pos[0] *= this.scale[0];
         pos[1] *= this.scale[1];
         pos[2] *= this.scale[2];
         let rotationMat = mat4.create();
+        // rotate
         mat4.rotate(rotationMat, rotationMat, this.rotation, vec3.fromValues(0, 1, 0));
+        console.log(this.rotation);
+        //rotate
         vec4.transformMat4(pos, pos, rotationMat);
         vec4.transformMat4(nor, nor, rotationMat);
         // move position to the input center
         vec4.add(pos, this.center, pos);
         this.finalPos = this.finalPos.concat([pos[0], pos[1], pos[2], 1]);
-        this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 1]);
+        this.finalNor = this.finalNor.concat([nor[0], nor[1], nor[2], 0]);
         // make array of colors 
-        this.finalCol = this.finalCol.concat(this.color);
+        this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
     }
+    console.log("CUBE");
   }
 
 };

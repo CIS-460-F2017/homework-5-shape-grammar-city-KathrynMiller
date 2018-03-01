@@ -19,13 +19,14 @@ class CityRenderer extends Drawable {
         this.iterations = i;
         this.grammar = new Grammar(a);
         this.buildings = new Set<Shape>();
+        //this.buildings.add(new Shape("c", false, vec3.fromValues(0, 0, 0), 0, vec3.fromValues(1, 1, 1), vec3.fromValues(1, 1, 1), false));
         this.createStreets();
         this.placeBuildings();
-        //this.parseShapeGrammar();
+        this.parseShapeGrammar();
     }
 
     parseShapeGrammar() {
-        this.iterations = 8;
+        this.iterations = 1;
         for(let i = 0; i < this.iterations; i++) {
             let newShapes = new Set<Shape>();
             for(let s of this.buildings) {
@@ -36,6 +37,20 @@ class CityRenderer extends Drawable {
                     this.buildings.delete(s);
                     // add the buildings successors to the set of new buildings
                     for(let newShape of successors) {
+                        let rayDir = vec3.create();
+                        // ray from object to center (needs to be altered if centerCity is not origin)
+                        rayDir = vec3.normalize(rayDir, newShape.getCenter());
+                        // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
+                        let rotation = 0;
+                        vec3.scale(rayDir, rayDir, -1)
+                        let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
+                        rotation = Math.acos(dot);
+                        console.log("rotation: " + rotation * 180.0 / Math.PI);
+                        // fix wonky rotations on one half of the circle
+                        if(newShape.getCenter()[0] >= 0) {
+                            rotation *= -1;
+                        }
+                        newShape.setRotation(rotation);
                         newShapes.add(newShape);
                     }   
                 } else if (s.isTerminal() && !s.hasRoof()) { // if building is terminal in all directions, add roof 
@@ -72,32 +87,30 @@ class CityRenderer extends Drawable {
         let r = 5;
         let roadScale = vec3.fromValues(.5, .5, .5);
         let roadColor = vec3.fromValues(.2, .6, 1);
+        // place buildings within initial circle
+        // TODO add unique landmarks in center of city and within this circle
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
             let buildingCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(i), 0, this.centerCity[2] + r * Math.sin(i));
-            // bring geometry in from the river then use this vector to rotate initial box
+            // bring geometry in from the river then use this vector to rotate towards the center
             let rayDir = vec3.create();
             // ray from object to center (needs to be altered if centerCity is not origin)
             rayDir = vec3.normalize(rayDir, buildingCenter);
             let offset = vec3.create();
             offset = vec3.scale(offset, rayDir, 1);
             buildingCenter = vec3.subtract(buildingCenter, buildingCenter, offset);
-            // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
-            let rotation = 0;
-            vec3.scale(rayDir, rayDir, -1)
-            let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
-            rotation = Math.acos(dot);
-            // fix wonky rotations on one half of the circle
-            if(buildingCenter[0] >= 0) {
-                rotation *= -1;
-            }
-            let newBuilding = new Shape("c", true, buildingCenter, rotation, vec3.fromValues(1, 1, 1), roadColor, true);
+            
+            let newBuilding = new Shape("c", false, buildingCenter, 0, vec3.fromValues(1, 1, 1), roadColor, false);
             this.buildings.add(newBuilding);
-        }
-        
+        }   
     }
-    toDegrees(d: number): number {
-        return d * 180.0 / Math.PI;
-      }
+
+    // adds planes to set of roads that draw a line between two input points
+    drawLine(start: vec3, end: vec3, scale: number) {
+        let slope = (start[0] - end[0]) / (start[2] - end [2]);
+        let stepSize = .2;
+    }
+
+
     toRadians(d: number): number {
         return d * Math.PI / 180.0;
       }
@@ -110,6 +123,7 @@ class CityRenderer extends Drawable {
         this.lastIdx = 0;
         // add vbo data from each shape to final vbo data
         for(let shape of this.buildings) {
+            shape.getGeometry().create();
             finalPos = finalPos.concat(shape.getGeometry().getPositions());
             finalNor = finalNor.concat(shape.getGeometry().getNormals());
             finalCol = finalCol.concat(shape.getGeometry().getColors());

@@ -11,7 +11,7 @@ abstract class Geometry {
   center: vec4;
   scale: vec3;
   rotation: number;
-  color: number[];
+  color: vec3;
 
   getNormals(): Array<number> {
     return this.finalNor;
@@ -27,6 +27,23 @@ abstract class Geometry {
 
   getColors(): Array<number> {
     return this.finalCol;
+  }
+
+  getScale(): vec3 {
+    return this.scale;
+  }
+
+  getRotation(): number {
+    return this.rotation;
+  }
+
+  getColor(): vec3 {
+    return vec3.fromValues(this.color[0], this.color[1], this.color[2]);
+  }
+
+  setRotation(degree: number) {
+    this.rotation = degree;
+    console.log("set rotation  " + this.rotation);
   }
 
   abstract create(): void;
