@@ -15,11 +15,11 @@ class Plane extends Geometry {
   }
 
   create() {
-
+    
     // reset arrays in case this is being redone to account for scaling
     this.finalPos = new Array();
     this.finalNor = new Array();
-  
+    this.finalCol = new Array();
     this.finalIndices = [0, 1, 2,
                                     0, 2, 3];
     let normals = new Array<Array<number>>(
@@ -52,7 +52,8 @@ class Plane extends Geometry {
           // make array of colors 
           this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
       }
-
+      console.log(this.finalPos.length);
+      console.log(this.finalCol.length);
   }
 };
 

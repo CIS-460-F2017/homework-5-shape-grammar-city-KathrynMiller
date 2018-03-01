@@ -40,7 +40,13 @@ class Grammar {
         } else {
             newShapes.add(oldBuilding);
         }
-
+        for(let shape of newShapes) {
+            r = Math.random();
+            r -= .5;
+            let height = heightMax + r;
+            shape.scaleY(height);
+            shape.makeTerminal();
+        }
         return newShapes;
     }
 
@@ -141,8 +147,8 @@ class Grammar {
         vec3.add(p2Center, oldBuilding.getCenter(), tangent);
 
         let pillarScale = vec3.fromValues(newScale[0] / 3.0 - .01, newScale[1], newScale[2] / 1.5);
-        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), oldBuilding.hasRoof());
-        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), oldBuilding.hasRoof());
+        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), false);
+        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), false);
 
         newShapes.add(p1);
         newShapes.add(p2);
@@ -169,8 +175,8 @@ class Grammar {
         vec3.add(newCenter2, oldBuilding.getCenter(), forward);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
 
-        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), oldBuilding.hasRoof());
-        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 0, 0), oldBuilding.hasRoof());
+        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
+        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 0, 0), false);
         let newShapes = new Set<Shape>();
         newShapes.add(b1);
         newShapes.add(b2);

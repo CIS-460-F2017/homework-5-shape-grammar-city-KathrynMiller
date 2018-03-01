@@ -43,7 +43,6 @@ abstract class Geometry {
 
   setRotation(degree: number) {
     this.rotation = degree;
-    console.log("set rotation  " + this.rotation);
   }
 
   abstract create(): void;

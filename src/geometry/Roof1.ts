@@ -30,6 +30,9 @@ class Roof1 extends Geometry{
 
   create() {
     this.finalIndices = Roof1.indices;
+    this.finalPos = new Array();
+    this.finalNor = new Array();
+    this.finalCol = new Array();
     for(let i = 0; i < Roof1.vertices.length; i++) {
         let pos = vec4.create();
         let nor = vec4.create();
@@ -50,6 +53,7 @@ class Roof1 extends Geometry{
         this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
     }
   }
+  
 
 };
 

@@ -1,5 +1,5 @@
 import Shape from './Shape';
-import Roads from './Roads';
+
 import Grammar from './Grammar';
 import Drawable from './rendering/gl/Drawable';
 import {gl} from './globals';
@@ -26,7 +26,7 @@ class CityRenderer extends Drawable {
     }
 
     parseShapeGrammar() {
-        this.iterations = 1;
+        this.iterations = 2;
         for(let i = 0; i < this.iterations; i++) {
             let newShapes = new Set<Shape>();
             for(let s of this.buildings) {
@@ -40,7 +40,6 @@ class CityRenderer extends Drawable {
                         newShapes.add(newShape);
                     }   
                 } else if (s.isTerminal() && !s.hasRoof()) { // if building is terminal in all directions, add roof 
-                    console.log("ADD ROOF");
                     let roof = this.grammar.addRoof(s);
                     newShapes.add(roof);
                 }
@@ -66,7 +65,7 @@ class CityRenderer extends Drawable {
         
     }
     // place buildings as radially outward streets are added. 
-    // for now, buildings are just 1x1 blocks that will be subdivided in the parse method before behind drawn
+    // for now, buildings are just 1x1 blocks that will be subdivided in the parse method before being drawn
     placeBuildings() {
         let changeTheta = this.toRadians(18.0);
         // rotate about some center point and place small square planes to build multiple concentric roads
@@ -86,23 +85,37 @@ class CityRenderer extends Drawable {
             buildingCenter = vec3.subtract(buildingCenter, buildingCenter, offset);
             // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
             let rotation = 0;
-            vec3.scale(rayDir, rayDir, -1)
+            vec3.scale(rayDir, rayDir, -1);
             let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
             rotation = Math.acos(dot);
              // fix wonky rotations on one half of the circle
              if(buildingCenter[0] >= 0) {
                  rotation *= -1;
             }
-
             let newBuilding = new Shape("c", false, buildingCenter, rotation, vec3.fromValues(1, 1, 1), roadColor, false);
             this.buildings.add(newBuilding);
         }   
+        
     }
 
     // adds planes to set of roads that draw a line between two input points
     drawLine(start: vec3, end: vec3, scale: number) {
         let slope = (start[0] - end[0]) / (start[2] - end [2]);
-        let stepSize = .2;
+        let stepSize = .1;
+        let planeCenter = vec3.create();
+        let roadColor = vec3.fromValues(.2, .6, 1);
+        let rayDir = vec3.create();
+        let rotation = 0;
+        for(let x = start[0]; x < end[0]; x+= stepSize) {
+            planeCenter[0] = x;
+            planeCenter[2] = slope * x;
+            // rotate plant to avoid stepping in lines
+            rayDir = vec3.normalize(rayDir, planeCenter);
+            let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
+            rotation = Math.acos(dot);
+            let plane = new Shape("r", true, planeCenter, rotation, vec3.fromValues(scale, scale, scale), roadColor, false);
+            this.roads.add(plane);
+        }
     }
 
 
@@ -128,8 +141,15 @@ class CityRenderer extends Drawable {
             }
             this.lastIdx += shape.getGeometry().getPositions().length / 4;
         }
+        /*
+        console.log("pos: " + finalPos.length);
+        console.log("nor: " + finalNor.length);
+        console.log("col: " + finalCol.length);
+        console.log("idx: " + finalIdx.length);
+        */
         // add road geometry
         for(let shape of this.roads) {
+            shape.getGeometry().create();
             finalPos = finalPos.concat(shape.getGeometry().getPositions());
             finalNor = finalNor.concat(shape.getGeometry().getNormals());
             finalCol = finalCol.concat(shape.getGeometry().getColors());

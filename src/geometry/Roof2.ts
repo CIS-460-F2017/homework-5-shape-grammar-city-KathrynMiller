@@ -29,6 +29,9 @@ class Roof2 extends Geometry{
   }
 
   create() {
+    this.finalPos = new Array();
+    this.finalNor = new Array();
+    this.finalCol = new Array();
     this.finalIndices = Roof2.indices;
     for(let i = 0; i < Roof2.vertices.length; i++) {
         let pos = vec4.create();

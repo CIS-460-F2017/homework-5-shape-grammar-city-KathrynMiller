@@ -15,7 +15,7 @@ class Cube extends Geometry{
   // reset arrays in case this is being redone to account for scaling
   this.finalPos = new Array();
   this.finalNor = new Array();
-
+  this.finalCol = new Array();
   this.finalIndices = [0, 1, 2,
                                   0, 2, 3,
                                   4, 5, 6,
@@ -100,7 +100,6 @@ class Cube extends Geometry{
         let rotationMat = mat4.create();
         // rotate
         mat4.rotate(rotationMat, rotationMat, this.rotation, vec3.fromValues(0, 1, 0));
-        console.log(this.rotation);
         //rotate
         vec4.transformMat4(pos, pos, rotationMat);
         vec4.transformMat4(nor, nor, rotationMat);

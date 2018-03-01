@@ -41,7 +41,6 @@ class Shape {
     }
 
     scaleY(h: number) {
-        console.log("scale");
         this.scale[1] += h;
         // reset vbo data
         this.geometry_type.scale[1] += h;
@@ -82,7 +81,6 @@ class Shape {
 
     setRotation(degree: number) {
         this.geometry_type.setRotation(degree);
-        console.log("get rotation: " + this.geometry_type.getRotation());
     }
 
     getHeight(): number {
