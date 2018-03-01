@@ -121,17 +121,28 @@ class Grammar {
     // creates one building with two pillars in the front
     type4(oldBuilding: Shape): Set<Shape> {
         let newShapes = new Set<Shape>();
-        let halves = this.divideX(oldBuilding);
+        let forward = vec3.create();
+        let tangent = vec3.create();
+        vec3.normalize(forward, oldBuilding.getCenter());
+        vec3.cross(tangent, forward, vec3.fromValues(0, 1, 0));
+
+        let baseOffset = vec3.create();
         let offset = oldBuilding.getScale()[0] / 4.0 + .05;
-        let baseCenter = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] - offset);
+        vec3.scale(baseOffset, forward, offset);
+        let baseCenter = vec3.create();
+        vec3.subtract(baseCenter, oldBuilding.getCenter(), baseOffset);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
-        let base = new Shape("c", false, baseCenter, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
+        let base = new Shape("c", false, baseCenter, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 1, 1), false);
         
-        let p1Center = vec3.fromValues(oldBuilding.getCenter()[0] - offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + .1);
-        let p2Center = vec3.fromValues(oldBuilding.getCenter()[0] + offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + .1);
+        vec3.scale(tangent, tangent, offset);
+        let p1Center = vec3.create();
+        vec3.subtract(p1Center, oldBuilding.getCenter(), tangent);
+        let p2Center = vec3.create();
+        vec3.add(p2Center, oldBuilding.getCenter(), tangent);
+
         let pillarScale = vec3.fromValues(newScale[0] / 3.0 - .01, newScale[1], newScale[2] / 1.5);
-        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(0, 0, 1), oldBuilding.hasRoof());
-        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 0, 0), oldBuilding.hasRoof());
+        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), oldBuilding.hasRoof());
+        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), oldBuilding.hasRoof());
 
         newShapes.add(p1);
         newShapes.add(p2);
@@ -152,10 +163,8 @@ class Grammar {
         // get forward vector and move forward and backwards along this instead of always z
         vec3.normalize(forward, oldBuilding.getCenter());
         vec3.scale(forward, forward, offset);
-        //let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] - offset);
         let newCenter1 = vec3.create();
         vec3.subtract(newCenter1, oldBuilding.getCenter(), forward);
-        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + offset);
         let newCenter2 = vec3.create();
         vec3.add(newCenter2, oldBuilding.getCenter(), forward);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
@@ -180,11 +189,8 @@ class Grammar {
         vec3.scale(tangent, tangent, offset);
         let newCenter1 = vec3.create();
         vec3.subtract(newCenter1, oldBuilding.getCenter(), tangent);
-        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0], oldBuilding.getCenter()[1], oldBuilding.getCenter()[2] + offset);
         let newCenter2 = vec3.create();
         vec3.add(newCenter2, oldBuilding.getCenter(), tangent);
-        //let newCenter1 = vec3.fromValues(oldBuilding.getCenter()[0] - offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
-        //let newCenter2 = vec3.fromValues(oldBuilding.getCenter()[0] + offset, oldBuilding.getCenter()[1], oldBuilding.getCenter()[2]);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0] / 2.0 - .01, oldBuilding.getScale()[1], oldBuilding.getScale()[2]);
 
         let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);

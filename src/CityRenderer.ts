@@ -37,20 +37,6 @@ class CityRenderer extends Drawable {
                     this.buildings.delete(s);
                     // add the buildings successors to the set of new buildings
                     for(let newShape of successors) {
-                        let rayDir = vec3.create();
-                        // ray from object to center (needs to be altered if centerCity is not origin)
-                        rayDir = vec3.normalize(rayDir, newShape.getCenter());
-                        // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
-                        let rotation = 0;
-                        vec3.scale(rayDir, rayDir, -1)
-                        let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
-                        rotation = Math.acos(dot);
-                        console.log("rotation: " + rotation * 180.0 / Math.PI);
-                        // fix wonky rotations on one half of the circle
-                        if(newShape.getCenter()[0] >= 0) {
-                            rotation *= -1;
-                        }
-                        newShape.setRotation(rotation);
                         newShapes.add(newShape);
                     }   
                 } else if (s.isTerminal() && !s.hasRoof()) { // if building is terminal in all directions, add roof 
@@ -82,7 +68,7 @@ class CityRenderer extends Drawable {
     // place buildings as radially outward streets are added. 
     // for now, buildings are just 1x1 blocks that will be subdivided in the parse method before behind drawn
     placeBuildings() {
-        let changeTheta = this.toRadians(20.0);
+        let changeTheta = this.toRadians(18.0);
         // rotate about some center point and place small square planes to build multiple concentric roads
         let r = 5;
         let roadScale = vec3.fromValues(.5, .5, .5);
@@ -98,8 +84,17 @@ class CityRenderer extends Drawable {
             let offset = vec3.create();
             offset = vec3.scale(offset, rayDir, 1);
             buildingCenter = vec3.subtract(buildingCenter, buildingCenter, offset);
-            
-            let newBuilding = new Shape("c", false, buildingCenter, 0, vec3.fromValues(1, 1, 1), roadColor, false);
+            // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
+            let rotation = 0;
+            vec3.scale(rayDir, rayDir, -1)
+            let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
+            rotation = Math.acos(dot);
+             // fix wonky rotations on one half of the circle
+             if(buildingCenter[0] >= 0) {
+                 rotation *= -1;
+            }
+
+            let newBuilding = new Shape("c", false, buildingCenter, rotation, vec3.fromValues(1, 1, 1), roadColor, false);
             this.buildings.add(newBuilding);
         }   
     }
