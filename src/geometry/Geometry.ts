@@ -45,6 +45,10 @@ abstract class Geometry {
     this.rotation = degree;
   }
 
+  setColor(color: vec3) {
+    this.color = color;
+  }
+
   abstract create(): void;
 }
 export default Geometry;

@@ -5,6 +5,7 @@ import Roof1 from './geometry/Roof1';
 class Grammar {
     buildings: Set<Shape> = new Set();
     axiom: string;
+    color: vec3 = vec3.fromValues(153 / 255, 0 / 255, 76 / 255);
 
     // TODO: change to not have axiom but number of buildings and place around grid
     constructor(a: string) {
@@ -38,6 +39,8 @@ class Grammar {
         } else if (r < .8) {
             newShapes = this.type4(oldBuilding);
         } else {
+            let newCol = this.getColor(oldBuilding.getCenter());
+            oldBuilding.setColor(newCol);
             newShapes.add(oldBuilding);
         }
         for(let shape of newShapes) {
@@ -48,6 +51,12 @@ class Grammar {
             shape.makeTerminal();
         }
         return newShapes;
+    }
+    // returns color for an object based on its distance from the center
+    getColor(pos: vec3): vec3 {
+        let col = vec3.create();
+        col = vec3.scale(col, this.color, vec3.length(pos) / 4.0);
+        return col;
     }
 
     //divide random side, divide random half in other direction, scale all up a little
@@ -138,7 +147,9 @@ class Grammar {
         let baseCenter = vec3.create();
         vec3.subtract(baseCenter, oldBuilding.getCenter(), baseOffset);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
-        let base = new Shape("c", false, baseCenter, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 1, 1), false);
+        // set colors based on distance from center
+        let baseCol = this.getColor(baseCenter);
+        let base = new Shape("c", false, baseCenter, oldBuilding.getRotation(), newScale, baseCol, false);
         
         vec3.scale(tangent, tangent, offset);
         let p1Center = vec3.create();
@@ -147,8 +158,10 @@ class Grammar {
         vec3.add(p2Center, oldBuilding.getCenter(), tangent);
 
         let pillarScale = vec3.fromValues(newScale[0] / 3.0 - .01, newScale[1], newScale[2] / 1.5);
-        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), false);
-        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, vec3.fromValues(1, 1, 1), false);
+        let color1 = this.getColor(p1Center);
+        let color2 = this.getColor(p2Center);
+        let p1 = new Shape("c", false, p1Center, oldBuilding.getRotation(), pillarScale, color1, false);
+        let p2 = new Shape("c", false, p2Center, oldBuilding.getRotation(), pillarScale, color2, false);
 
         newShapes.add(p1);
         newShapes.add(p2);
@@ -175,8 +188,10 @@ class Grammar {
         vec3.add(newCenter2, oldBuilding.getCenter(), forward);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0], oldBuilding.getScale()[1], oldBuilding.getScale()[2] / 2.0 - .01);
 
-        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
-        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 0, 0), false);
+        let color1 = this.getColor(newCenter1);
+        let color2 = this.getColor(newCenter2);
+        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, color1, false);
+        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, color2, false);
         let newShapes = new Set<Shape>();
         newShapes.add(b1);
         newShapes.add(b2);
@@ -199,8 +214,10 @@ class Grammar {
         vec3.add(newCenter2, oldBuilding.getCenter(), tangent);
         let newScale = vec3.fromValues(oldBuilding.getScale()[0] / 2.0 - .01, oldBuilding.getScale()[1], oldBuilding.getScale()[2]);
 
-        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, vec3.fromValues(0, 0, 1), false);
-        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, vec3.fromValues(1, 0, 0), false);
+        let color1 = this.getColor(newCenter1);
+        let color2 = this.getColor(newCenter2);;
+        let b1 = new Shape("c", false, newCenter1, oldBuilding.getRotation(), newScale, color1, false);
+        let b2 = new Shape("c", false, newCenter2, oldBuilding.getRotation(), newScale, color2, false);
         let newShapes = new Set<Shape>();
         newShapes.add(b1);
         newShapes.add(b2);

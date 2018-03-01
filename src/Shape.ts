@@ -59,6 +59,11 @@ class Shape {
         return this.geometry_type;
     }
 
+    setColor(color: vec3) {
+        this.color = color;
+        this.geometry_type.setColor(color);
+    }
+
     getCenter(): vec3 {
         return this.position;
     }

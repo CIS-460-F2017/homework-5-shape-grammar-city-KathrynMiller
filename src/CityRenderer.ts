@@ -12,6 +12,7 @@ class CityRenderer extends Drawable {
     lastIdx: number;
     roads: Set<Shape> = new Set();
     centerCity: vec3 = vec3.fromValues(0, 0, 0);
+    roadColor: vec3 = vec3.fromValues(.2, .6, 1);
 
     constructor(a: string, i: number) {
         super();
@@ -20,8 +21,8 @@ class CityRenderer extends Drawable {
         this.grammar = new Grammar(a);
         this.buildings = new Set<Shape>();
         //this.buildings.add(new Shape("c", false, vec3.fromValues(0, 0, 0), 0, vec3.fromValues(1, 1, 1), vec3.fromValues(1, 1, 1), false));
-        this.createStreets();
-        this.placeBuildings();
+        this.innerCircle();
+        this.outerRings(5, 7, 15);
         this.parseShapeGrammar();
     }
 
@@ -51,52 +52,82 @@ class CityRenderer extends Drawable {
         }
     } 
 
-    createStreets() {
+    innerCircle() {
         let changeTheta = this.toRadians(3.0);
         // rotate about some center point and place small square planes to build multiple concentric roads
         let r = 5;
         let roadScale = vec3.fromValues(.5, .5, .5);
-        let roadColor = vec3.fromValues(.2, .6, 1);
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
-            let roadCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(i), -.21, this.centerCity[2] + r * Math.sin(i));
-            let newRoad = new Shape("r", true, roadCenter, 0, roadScale, roadColor, true);
+            let roadCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(i), 0, this.centerCity[2] + r * Math.sin(i));
+            let newRoad = new Shape("r", true, roadCenter, 0, roadScale, this.roadColor, true);
             this.roads.add(newRoad);
         }
-        
-    }
-    // place buildings as radially outward streets are added. 
-    // for now, buildings are just 1x1 blocks that will be subdivided in the parse method before being drawn
-    placeBuildings() {
-        let changeTheta = this.toRadians(18.0);
-        // rotate about some center point and place small square planes to build multiple concentric roads
-        let r = 5;
-        let roadScale = vec3.fromValues(.5, .5, .5);
-        let roadColor = vec3.fromValues(.2, .6, 1);
-        // place buildings within initial circle
+        changeTheta = this.toRadians(18.0);
         // TODO add unique landmarks in center of city and within this circle
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
-            let buildingCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(i), 0, this.centerCity[2] + r * Math.sin(i));
-            // bring geometry in from the river then use this vector to rotate towards the center
-            let rayDir = vec3.create();
-            // ray from object to center (needs to be altered if centerCity is not origin)
-            rayDir = vec3.normalize(rayDir, buildingCenter);
-            let offset = vec3.create();
-            offset = vec3.scale(offset, rayDir, 1);
-            buildingCenter = vec3.subtract(buildingCenter, buildingCenter, offset);
-            // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
-            let rotation = 0;
-            vec3.scale(rayDir, rayDir, -1);
-            let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
-            rotation = Math.acos(dot);
-             // fix wonky rotations on one half of the circle
-             if(buildingCenter[0] >= 0) {
-                 rotation *= -1;
-            }
-            let newBuilding = new Shape("c", false, buildingCenter, rotation, vec3.fromValues(1, 1, 1), roadColor, false);
-            this.buildings.add(newBuilding);
-        }   
+            this.radialBuilding(r, i);
+        }    
         
     }
+
+    // helper that adds a building at angle theta and radius r from the center
+    radialBuilding(r: number, theta: number) {
+        let buildingCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(theta), 0, this.centerCity[2] + r * Math.sin(theta));
+        // bring geometry in from the river then use this vector to rotate towards the center
+        let rayDir = vec3.create();
+        // ray from object to center (needs to be altered if centerCity is not origin)
+        rayDir = vec3.normalize(rayDir, buildingCenter);
+        let offset = vec3.create();
+        offset = vec3.scale(offset, rayDir, 1);
+        buildingCenter = vec3.subtract(buildingCenter, buildingCenter, offset);
+        // calculate rotation by assuming forward vector of block is +z and take dot product of this and rayDir
+        let rotation = 0;
+        vec3.scale(rayDir, rayDir, -1);
+        let dot = vec3.dot(rayDir, vec3.fromValues(0, 0, 1));
+        rotation = Math.acos(dot);
+        // fix wonky rotations on one half of the circle
+        if(buildingCenter[0] >= 0) {
+            rotation *= -1;
+        }
+        let newBuilding = new Shape("c", false, buildingCenter, rotation, vec3.fromValues(1, 1, 1), this.roadColor, false);
+        this.buildings.add(newBuilding);
+    }
+
+    // draw inner radius as well as buildings extending to outer radius for a ring around the city
+    outerRings(innerR: number, outerR: number, changeTheta: number) {
+        changeTheta = this.toRadians(changeTheta);
+        let r = Math.random();
+        let theta = 0;
+        r += 3;
+        let streetThetas = new Array();
+        // create a list of 0 - 10 thetas representing where radial streets will be placed for this innerR to outerR
+        for(let i = 0; i < r; i++) {
+            theta = Math.random() * 2 * Math.PI;
+            streetThetas.push(theta);
+        }
+        for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
+            let drawStreet = false;
+            // if this angle is in the range of some street theta, draw a line and set drawStreet to true
+            for(let j = 0; j < streetThetas.length; j++) {
+                let currTheta = streetThetas[j];
+                if((i - changeTheta / 2 <  currTheta) && (i + changeTheta / 2 >  currTheta) && !drawStreet) {
+                    console.log("draw street");
+                    drawStreet = true;
+                    let start = vec3.fromValues(this.centerCity[0] + innerR * Math.cos(i), 0, this.centerCity[2] + innerR * Math.sin(i));
+                    let end = vec3.fromValues(this.centerCity[0] + outerR * Math.cos(i), 0, this.centerCity[2] + outerR * Math.sin(i));
+                    //TODO: vary line width
+                    this.drawLine(start, end, .5);
+                    console.log(start);
+                    console.log(end);
+                }
+            }
+            
+            // if there shouldn't be a street through this angle, place building
+            if(!drawStreet)  {
+                this.radialBuilding(outerR, i);
+            }
+        }   
+    } 
 
     // adds planes to set of roads that draw a line between two input points
     drawLine(start: vec3, end: vec3, scale: number) {
@@ -141,12 +172,6 @@ class CityRenderer extends Drawable {
             }
             this.lastIdx += shape.getGeometry().getPositions().length / 4;
         }
-        /*
-        console.log("pos: " + finalPos.length);
-        console.log("nor: " + finalNor.length);
-        console.log("col: " + finalCol.length);
-        console.log("idx: " + finalIdx.length);
-        */
         // add road geometry
         for(let shape of this.roads) {
             shape.getGeometry().create();

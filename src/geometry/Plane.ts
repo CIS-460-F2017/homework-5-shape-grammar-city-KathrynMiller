@@ -30,10 +30,10 @@ class Plane extends Geometry {
   
   // transform plane based on inputs
    let positions = new Array<Array<number>>();
-    positions = (                     [[-.5 ,.5, .5, 1],
-                                        [.5, .5, .5, 1],
-                                        [.5, .5, -.5, 1],
-                                        [-.5, .5, -.5, 1]]);
+    positions = (                     [[-.5 ,.01, .5, 1],
+                                        [.5, .01, .5, 1],
+                                        [.5, .01, -.5, 1],
+                                        [-.5, .01, -.5, 1]]);
   
       for(let i = 0; i < positions.length; i++) {
           let pos = vec4.fromValues(positions[i][0], positions[i][1], positions[i][2], 1);
@@ -52,8 +52,6 @@ class Plane extends Geometry {
           // make array of colors 
           this.finalCol = this.finalCol.concat(this.color[0], this.color[1], this.color[2], 1);
       }
-      console.log(this.finalPos.length);
-      console.log(this.finalCol.length);
   }
 };
 
