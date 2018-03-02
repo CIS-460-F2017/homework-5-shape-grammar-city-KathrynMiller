@@ -1,6 +1,8 @@
-Kathryn Miller
+cityKathryn Miller
 
 Link: https://kathrynmiller.github.io/homework-5-shape-grammar-city-KathrynMiller/index.html
+
+![](city.png)
 
 General Approach: 
 
