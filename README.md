@@ -1,5 +1,7 @@
 Kathryn Miller
 
+Link: https://kathrynmiller.github.io/homework-5-shape-grammar-city-KathrynMiller/index.html
+
 General Approach: 
 
 I started by creating a Grammar class that had method for sub dividing an initial base cube along the x and z axis as well as being able to scale it in the y direction. Each piece of geometry was represented as a shape that maintained its geometry type, position, orientation and color. I then made a CityRenderer class that maintained a set of all of the geometry in the city. My CityRenderer class has methods for placing the buildings and roads in the city as well as dividing the base meshes before combining all the geometry into a final vbo set and rendering. 
@@ -14,5 +16,5 @@ I knew initally that I wanted to do a city with a concentric layout so I created
 
 Color:
 
-I assigned each geometry a color as a linear interpolation of two colors based on the building's distance from the center of the city.
+I assigned each geometry a color as a linear interpolation of two colors based on the building's distance from the center of the city. Then I added a skybox I wrote earlier this year.
 
