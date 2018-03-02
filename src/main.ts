@@ -1,4 +1,4 @@
-import {vec3, vec4} from 'gl-matrix';
+import {vec3, vec4, vec2, mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -12,6 +12,7 @@ import Roof1 from './geometry/Roof1';
 import Roof2 from './geometry/Roof2';
 import Roof3 from './geometry/Roof3';
 import CityRenderer from './CityRenderer';
+import Icosphere from './geometry/Icosphere';
 
 var OBJ = require('webgl-obj-loader');
 let roof1: object;
@@ -43,6 +44,7 @@ const controls = {
 let city: CityRenderer;
 let square: Square;
 let base: Square;
+let skyBox: Icosphere;
 let time: number = 0;
 
 
@@ -52,6 +54,8 @@ function loadScene() {
   base.create();
   city = new CityRenderer("c", 1);
   city.create();
+  skyBox = new Icosphere(vec3.fromValues(0, 0, 0), 50.0, 6.0);
+  skyBox.create();
 }
 
 // fix for loader being called after main
@@ -96,18 +100,28 @@ function main2() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
+  const sky = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/sky-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/sky-frag.glsl')),
+  ]);
+
+  sky.setDimensions(vec2.fromValues(window.innerWidth, window.innerHeight));
+  let invViewProj = mat4.create();
+  mat4.invert(invViewProj, camera.projectionMatrix);
+  sky.setViewProjMatrix(invViewProj);
+
   // initialize time in shader
   lambert.setTime(time);
+  sky.setTime(time);
   time++;
   
   // This function will be called every frame
   function tick() {
     camera.update();
     
+    sky.setTime(time);
     lambert.setTime(time);
     time++;
-
-    
 
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -115,8 +129,11 @@ function main2() {
   
     renderer.render(camera, lambert, [
        base, 
-       city
+       city,
     ]);
+    renderer.render(camera, sky, [
+      skyBox,
+   ]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
@@ -132,7 +149,8 @@ function main2() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
-
+  sky.setDimensions(vec2.fromValues(window.innerWidth, window.innerHeight));
+  
   // Start the render loop
   tick();
 }

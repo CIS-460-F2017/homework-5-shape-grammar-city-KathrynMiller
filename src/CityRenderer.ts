@@ -107,11 +107,11 @@ class CityRenderer extends Drawable {
         }
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
             let drawStreet = false;
-            // if this angle is in the range of some street theta, draw a line and set drawStreet to true
+            // for each angle where a street should
             for(let j = 0; j < streetThetas.length; j++) {
                 let currTheta = streetThetas[j];
+                // if this angle is in the range of some street theta, draw a line and set drawStreet to true
                 if((i - changeTheta / 2 <  currTheta) && (i + changeTheta / 2 >  currTheta) && !drawStreet) {
-                    console.log("draw street");
                     drawStreet = true;
                     let start = vec3.fromValues(this.centerCity[0] + innerR * Math.cos(i), 0, this.centerCity[2] + innerR * Math.sin(i));
                     let end = vec3.fromValues(this.centerCity[0] + outerR * Math.cos(i), 0, this.centerCity[2] + outerR * Math.sin(i));

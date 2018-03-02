@@ -1,4 +1,4 @@
-import {vec4, mat4} from 'gl-matrix';
+import {vec4, mat4, vec2} from 'gl-matrix';
 import Drawable from './Drawable';
 import {gl} from '../../globals';
 
@@ -26,6 +26,7 @@ class ShaderProgram {
   attrCol: number;
   attrUVs: number;
 
+  unifDim: WebGLUniformLocation;
   unifModel: WebGLUniformLocation;
   unifModelInvTr: WebGLUniformLocation;
   unifViewProj: WebGLUniformLocation;
@@ -44,6 +45,7 @@ class ShaderProgram {
       throw gl.getProgramInfoLog(this.prog);
     }
 
+    this.unifDim = gl.getUniformLocation(this.prog, "u_Dimensions");
     this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
     this.attrUVs = gl.getAttribLocation(this.prog, "vs_UV");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
@@ -97,6 +99,14 @@ class ShaderProgram {
       gl.uniform1f(this.unifTime, time);
     }
   }
+
+  setDimensions(d: vec2) {
+    this.use();
+    if (this.unifDim !== -1) {
+      gl.uniform2fv(this.unifDim, d);
+    }
+  }
+
   setTexture() {
   //TODO FIX TEXTURE
   this.use();
