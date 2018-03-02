@@ -4,17 +4,12 @@ import Roof1 from './geometry/Roof1';
 
 class Grammar {
     buildings: Set<Shape> = new Set();
-    axiom: string;
-    color: vec3 = vec3.fromValues(153 / 255, 0 / 255, 76 / 255);
-
+    // color1: vec3 = vec3.fromValues(44 / 255, 131 / 255, 218 / 255); // bright blue
+    // color2: vec3 = vec3.fromValues(218 / 255, 44 / 153, 102 / 255); // pink
+    color1: vec3 = vec3.fromValues(204 / 255, 229 / 255, 255 / 255); // light blue
+    color2: vec3 = vec3.fromValues(255 / 255, 153 / 255, 153 / 255); // pink
     // TODO: change to not have axiom but number of buildings and place around grid
-    constructor(a: string) {
-        this.axiom = a;
-        // add base shapes to set of buildings based on axiom characters representing base layout
-        for(let i = 0; i < this.axiom.length; i++) {
-            let shape = new Shape(this.axiom[i], false, vec3.fromValues(0, 0, 0), 0, vec3.fromValues(1, 1, 1), vec3.fromValues(1, 1, 1), false);
-            this.buildings.add(shape);
-        }
+    constructor() {
     }
 
     // return new set of builings to replace input building 
@@ -24,7 +19,6 @@ class Grammar {
 // Terminal if max in all directions then add roof
     divide(oldBuilding: Shape): Set<Shape> {
         let newShapes = new Set<Shape>();
-        //let r = .6;
         let r = Math.random();
         // TODO base these on population density and oldBuilding center
         let areaMin = .2;
@@ -52,11 +46,19 @@ class Grammar {
         }
         return newShapes;
     }
+
     // returns color for an object based on its distance from the center
+    // linearly interpolate between two colors to get more dramatic effect
     getColor(pos: vec3): vec3 {
-        let col = vec3.create();
-        col = vec3.scale(col, this.color, vec3.length(pos) / 4.0);
-        return col;
+        let lerpValue = (vec3.length(pos) - 5) / 8.0;
+        let weight1 = 1 - lerpValue;
+        let col1 = vec3.create();
+        vec3.scale(col1, this.color1, weight1);
+        let col2 = vec3.create();
+        vec3.scale(col2, this.color2, lerpValue);
+        let finalCol = vec3.create();
+        vec3.add(finalCol, col1, col2);
+        return finalCol;
     }
 
     //divide random side, divide random half in other direction, scale all up a little
@@ -177,7 +179,7 @@ class Grammar {
 
     divideZ(oldBuilding: Shape): Set<Shape> {
         // offset amount from current centers
-        let offset = oldBuilding.getScale()[2] / 4.0 + .07;
+        let offset = (oldBuilding.getScale()[2] / 4.0 + .07);
         let forward = vec3.create();
         // get forward vector and move forward and backwards along this instead of always z
         vec3.normalize(forward, oldBuilding.getCenter());
@@ -201,7 +203,7 @@ class Grammar {
     // choose random character to represent different building slices or tops
     divideX(oldBuilding: Shape): Set<Shape> {
         // offset amount from current centers
-        let offset = oldBuilding.getScale()[0] / 4.0 + .07;
+        let offset = (oldBuilding.getScale()[0] / 4.0 + .07);
         let forward = vec3.create();
         let tangent = vec3.create();
         // get forward vector and move forward and backwards along this instead of always z

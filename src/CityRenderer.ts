@@ -12,17 +12,22 @@ class CityRenderer extends Drawable {
     lastIdx: number;
     roads: Set<Shape> = new Set();
     centerCity: vec3 = vec3.fromValues(0, 0, 0);
-    roadColor: vec3 = vec3.fromValues(.2, .6, 1);
+    roadColor: vec3 = vec3.fromValues(204 / 255, 229 / 255, 255 / 255);
 
-    constructor(a: string, i: number) {
+    constructor() {
         super();
         this.lastIdx = 0;
-        this.iterations = i;
-        this.grammar = new Grammar(a);
+        this.grammar = new Grammar();
         this.buildings = new Set<Shape>();
         //this.buildings.add(new Shape("c", false, vec3.fromValues(0, 0, 0), 0, vec3.fromValues(1, 1, 1), vec3.fromValues(1, 1, 1), false));
         this.innerCircle();
-        this.outerRings(5, 7, 15);
+        this.buildingRing(7, 13.0);
+        this.buildingRing(8.3, 12.0);
+        this.roadRing(8.5, 3.0);
+        this.buildingRing(10.5, 12.0);
+        this.buildingRing(12, 10.0);
+        this.roadRing(12, 2.0);
+        this.buildingRing(13.8, 8.0);
         this.parseShapeGrammar();
     }
 
@@ -52,6 +57,24 @@ class CityRenderer extends Drawable {
         }
     } 
 
+    roadRing(r: number, theta: number) {
+        theta = this.toRadians(theta);
+        let roadScale = vec3.fromValues(.5, .5, .5);
+        for(let i = 0; i < 2 * Math.PI; i += theta) {
+            let roadCenter = vec3.fromValues(this.centerCity[0] + r * Math.cos(i), 0, this.centerCity[2] + r  * Math.sin(i));
+            let newRoad = new Shape("r", true, roadCenter, 0, roadScale, this.roadColor, true);
+            this.roads.add(newRoad);
+        }
+    }
+
+    buildingRing(r: number, theta: number) {
+        theta = this.toRadians(theta);
+        for(let i = 0; i < 2 * Math.PI; i += theta) {
+            this.radialBuilding(r, i);
+        }   
+    }
+
+
     innerCircle() {
         let changeTheta = this.toRadians(3.0);
         // rotate about some center point and place small square planes to build multiple concentric roads
@@ -66,8 +89,10 @@ class CityRenderer extends Drawable {
         // TODO add unique landmarks in center of city and within this circle
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
             this.radialBuilding(r, i);
-        }    
-        
+        }  
+        // add fountain to center of city
+        let fountain = new Shape("f", true, vec3.fromValues(0, .5, 0), 0, vec3.fromValues(1, 1, 1), this.roadColor, true); 
+        this.buildings.add(fountain); 
     }
 
     // helper that adds a building at angle theta and radius r from the center
@@ -93,6 +118,7 @@ class CityRenderer extends Drawable {
         this.buildings.add(newBuilding);
     }
 
+    /* not working yet
     // draw inner radius as well as buildings extending to outer radius for a ring around the city
     outerRings(innerR: number, outerR: number, changeTheta: number) {
         changeTheta = this.toRadians(changeTheta);
@@ -105,6 +131,7 @@ class CityRenderer extends Drawable {
             theta = Math.random() * 2 * Math.PI;
             streetThetas.push(theta);
         }
+
         for(let i = 0; i < 2 * Math.PI; i += changeTheta) {
             let drawStreet = false;
             // for each angle where a street should
@@ -116,7 +143,7 @@ class CityRenderer extends Drawable {
                     let start = vec3.fromValues(this.centerCity[0] + innerR * Math.cos(i), 0, this.centerCity[2] + innerR * Math.sin(i));
                     let end = vec3.fromValues(this.centerCity[0] + outerR * Math.cos(i), 0, this.centerCity[2] + outerR * Math.sin(i));
                     //TODO: vary line width
-                    this.drawLine(start, end, .5);
+                    this.drawLine(start, end, .7);
                     console.log(start);
                     console.log(end);
                 }
@@ -126,8 +153,11 @@ class CityRenderer extends Drawable {
             if(!drawStreet)  {
                 this.radialBuilding(outerR, i);
             }
+            
+            this.radialBuilding(outerR, i);
         }   
     } 
+    */
 
     // adds planes to set of roads that draw a line between two input points
     drawLine(start: vec3, end: vec3, scale: number) {

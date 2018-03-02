@@ -24,11 +24,17 @@ uniform sampler2D u_Texture;
 in vec2 fs_UV;
 float fbm(const in vec2 uv);
 float noise(in vec2 uv);
+const float PI = 3.14159265359;
 
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 void main()
 {
+
+    float theta = mod(float(u_Time), 30000.0) * (2.0 * PI / 30000.0);
+    float z = float(cos(theta));
+    float y = float(sin(theta));
+    vec3 sunDir = normalize(vec3(0.0, .1, 1.0));
         // Material base color (before shading)
         vec4 diffuseColor = fs_Col;
         if(fs_UV.x == 2.0) {
@@ -36,7 +42,7 @@ void main()
             diffuseColor = vec4(1);
         }
         // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+        float diffuseTerm = dot(normalize(fs_Nor), normalize(vec4(sunDir, 1)));
         // Avoid negative lighting values
         // diffuseTerm = clamp(diffuseTerm, 0, 1);
 

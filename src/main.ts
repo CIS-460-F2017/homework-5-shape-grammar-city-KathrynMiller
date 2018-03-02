@@ -11,6 +11,7 @@ import Plane from './geometry/Plane';
 import Roof1 from './geometry/Roof1';
 import Roof2 from './geometry/Roof2';
 import Roof3 from './geometry/Roof3';
+import Fountain from './geometry/Fountain';
 import CityRenderer from './CityRenderer';
 import Icosphere from './geometry/Icosphere';
 
@@ -18,11 +19,13 @@ var OBJ = require('webgl-obj-loader');
 let roof1: object;
 let roof2: object;
 let roof3: object;
+let fountain: object;
 window.onload = function() {
   OBJ.downloadMeshes({
     'roof1': './src/objs/roof1.obj',
     'roof2': './src/objs/roof2.obj',
-    'roof3': './src/objs/roof3.obj'
+    'roof3': './src/objs/roof3.obj',
+    'fountain': './src/objs/fountain.obj'
   }, function(meshes: any) {
     roof1 = meshes.roof1;
     Roof1.setObjData(roof1);
@@ -30,6 +33,8 @@ window.onload = function() {
     Roof2.setObjData(roof2);
     roof3 = meshes.roof3;
     Roof3.setObjData(roof3);
+    fountain = meshes.fountain;
+    Fountain.setObjData(fountain);
     main2();
   });
 }
@@ -50,9 +55,9 @@ let time: number = 0;
 
 function loadScene() {
   // modified cube to be plant base
-  base = new Square(vec3.fromValues(0, 0, 0), vec3.fromValues(14, 14, 14), 0.0, [1, 1, 1, 1]);
+  base = new Square(vec3.fromValues(0, 0, 0), vec3.fromValues(13.3, 13.3, 13.3), 0.0, [209 / 255, 203 / 255, 193 / 255, 1]);
   base.create();
-  city = new CityRenderer("c", 1);
+  city = new CityRenderer();
   city.create();
   skyBox = new Icosphere(vec3.fromValues(0, 0, 0), 50.0, 6.0);
   skyBox.create();

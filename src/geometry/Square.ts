@@ -80,7 +80,7 @@ class Square extends Drawable {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUVs);
     gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
-    console.log("PLane");
+    console.log("square");
   }
 
 

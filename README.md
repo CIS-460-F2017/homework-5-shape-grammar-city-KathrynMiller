@@ -1,88 +1,18 @@
-# Homework 4: L-systems
+Kathryn Miller
 
-For this assignment, you will design a set of formal grammar rules to create
-a plant life using an L-system program. Once again, you will work from a
-Typescript / WebGL 2.0 base code like the one you used in homework 0. You will
-implement your own set of classes to handle the L-system grammar expansion and
-drawing. You will rasterize your L-system using faceted geometry. Feel free
-to use ray marching to generate an interesting background, but trying to
-raymarch an entire L-system will take too long to render!
+General Approach: 
 
-## L-System Components
-The way you implement your L-System is ultimately up to you, but we recommend
-creating the following classes / constructs to help you instantiate, expand, and
-draw your grammars:
-* Some sort of expandable collection of string characters. You might implement
-a linked list data structure, or you might use a basic Javascript array (which
-is resizeable).
-* Some sort of class to represent a Rule for expanding a character into a
-string. You might consider creating a map within each Rule that maps
-probabilities to strings, so that a Rule can represent multiple possible
-expansions for a character with different probabilities.
-* A second Rule-style class that dictates what drawing operation should be
-performed when a character is parsed during the drawing process. This should
-also be a map of probabilities, but this time the values in the map will be
-functions rather than strings. Invoke a given function, e.g. `drawBranch`, when
-a character is parsed.
-* A Turtle class that lets you keep track of, at minimum, a position, an
-orientation, and a depth. You should also create a stack onto which you can push
-and pop turtle states.
-* A class in which to store the VBOs that will represent __all__ of your faceted
-geometry. __Do not draw individual mesh components one at a time. This will
-cause your program to render very slowly.__ Instead, expand lists of vertex
-information as you "draw" your grammar, and push all VBO data to the GPU at once
-after you've finished parsing your entire string for drawing.
+I started by creating a Grammar class that had method for sub dividing an initial base cube along the x and z axis as well as being able to scale it in the y direction. Each piece of geometry was represented as a shape that maintained its geometry type, position, orientation and color. I then made a CityRenderer class that maintained a set of all of the geometry in the city. My CityRenderer class has methods for placing the buildings and roads in the city as well as dividing the base meshes before combining all the geometry into a final vbo set and rendering. 
 
-## OBJ loading
-So that you can more easily generate interesting-looking plants, we ask that you
-enable your program to import OBJ files and store their information in VBOs. You
-can either implement your own OBJ parser, or use an OBJ-loading package via NPM:
+Grammar: 
 
-[obj-mtl-loader](https://www.npmjs.com/package/obj-mtl-loader)
+My approach to subdividing the roads was to start everything with a 1x .5 x 1 block and subdivide it along x and z into one of five different configurations. Each configuration chooses a random direction at which to do its subdivisions. After dividing, a building can be scaled in the y direction. The amount by which it is scaled is determined by its proximity to the center of the city (where a population would typically be denser) and then jittered a little bit so that not every building equidistant from the center is the same height. I also maintained a boolean for each shape to tell the city renderer if the parent geometry had a roof yet. If it didn't have a roof I would append one of three random roofs to the top of the currenty shape at the same position, orientation, and scale in the x and z direction. Only ever dividing the buildings ensured that there would be no overlap but I think the base cube approach led to chunks of buildings that look too perfectly spaced.
 
-[webgl-obj-loader](https://www.npmjs.com/package/webgl-obj-loader)
+Building Placement:
 
+I knew initally that I wanted to do a city with a concentric layout so I created a method for placing a building at a given radius and angle relative to the center of the city (which is the origin as default). I then made methods for creating rings of buildings or roads given a change in theta and radius. What I didn't get to finish was making roads that extend radially outward from each of the rings to the next. My idea was to draw the buildings in a ring as I draw the radial roads by picking a few random thetas at which to draw the roads. Then, if the angle at which I was about to place a current building was close enough to one of the randomly selected angles at which I would draw a road, I wouldn't place a building but would instead draw a line from the inner road's radius to the next concentric radius. I got it to work such that the buildings would leave room for roads but somehow my roads were drawing incorrectly so I'd like to fix that in the future (it looks too uniform as is).
 
-## Aesthetic Requirements
-Your plant must have the following attributes:
-* It must grow in 3D
-* It must have flowers, leaves, or some other branch decoration in addition to
-basic branch geometry
-* Organic variation (i.e. noise or randomness in grammar expansion)
-* A flavorful twist. Don't just make a basic variation on the example broccoli
-grammar from the slides! Create a plant that is unique to you!
+Color:
 
-Feel free to use the resources linked in the slides for inspiration!
+I assigned each geometry a color as a linear interpolation of two colors based on the building's distance from the center of the city.
 
-## Interactivity
-Using dat.GUI, make at least three aspects of your demo an interactive variable.
-For example, you could modify:
-
-* The axiom
-* Your input grammar rules and their probability
-* The angle of rotation of the turtle
-* The size or color or material of the cylinder the turtle draws
-
-Don't feel restricted to these examples; make any attributes adjustable that you
-want!
-
-## Examples from last year (Click to go to live demo)
-
-Andrea Lin:
-
-[![](andreaLin.png)](http://andrea-lin.com/Project3-LSystems/)
-
-Tabatha Hickman:
-
-[![](tabathaHickman.png)](https://tabathah.github.io/Project3-LSystems/)
-
-Joe Klinger:
-
-[![](joeKlinger.png)](https://klingerj.github.io/Project3-LSystems/)
-
-## Extra Credit (Up to 20 points)
-For bonus points, add functionality to your L-system drawing that ensures
-geometry will never overlap. In other words, make your plant behave like a
-real-life plant so that its branches and other components don't compete for the
-same space. The more complex you make your L-system self-interaction, the more
-points you'll earn.

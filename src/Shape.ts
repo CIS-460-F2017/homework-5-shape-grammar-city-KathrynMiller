@@ -5,6 +5,7 @@ import Roof1 from './geometry/Roof1';
 import Roof2 from './geometry/Roof2';
 import Roof3 from './geometry/Roof3';
 import Plane from './geometry/Plane';
+import Fountain from './geometry/Fountain';
 
 class Shape {
     symbol: string = "";
@@ -37,6 +38,8 @@ class Shape {
             this.geometry_type = new Roof3(this.position, this.scale, this.rotation, this.color);
         } else if (symbol == "r") {
             this.geometry_type = new Plane(this.position, this.scale, this.rotation, this.color);
+        } else if (symbol == "f") {
+            this.geometry_type = new Fountain(this.position, this.scale, this.rotation, this.color);
         }
     }
 
